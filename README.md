@@ -3,17 +3,23 @@ Laptop Features and Total Sales by company Data Analysis
 Introduction
 This project focuses on analyzing laptop features and total sales data to derive valuable insights for understanding market trends, consumer preferences, and pricing strategies. By leveraging data analysis techniques, the project aims to provide a comprehensive overview of the laptop market and identify key factors affecting sales performance.
 
+
 Purpose of this Project
 The primary purpose of this project is to analyze and visualize data related to laptop features and sales performance. This analysis will help in:
 
 Understanding trends and patterns in laptop features and pricing.
+
 Identifying factors that influence sales.
+
 Providing actionable insights to support decision-making in marketing, product development, and sales strategies.
+
 Project Scope
 The scope of this project includes:
 
 Data collection and cleaning.
+
 Feature analysis to understand the distribution and impact of various laptop features.
+
 Sales data analysis to uncover trends and patterns.
 Visualization of findings using Power BI or similar tools.
 Generation of actionable insights and recommendations.
