@@ -1,0 +1,120 @@
+use laptop_price;
+SELECT * FROM laptop_price.laptop_data;
+UPDATE laptop_data SET Weight = REPLACE(Weight, 'kg', '');
+SELECT * FROM laptop_price.laptop_data;
+ALTER TABLE laptop_data MODIFY COLUMN Weight FLOAT;
+alter table laptop_data drop MyUnknownColumn;
+ALTER TABLE laptop_data ADD COLUMN Touchscreen varchar(30);
+UPDATE laptop_data SET Touchscreen = CASE WHEN ScreenResolution LIKE '%Touchscreen%' THEN 'yes' ELSE 'no' END;
+alter table UPDATE laptop_table SET Touchscreen = CASE WHEN ScreenResolution LIKE '%Touchscreen%' THEN 'yes' ELSE 'no' END;
+ALTER TABLE laptop_data ADD COLUMN category VARCHAR(50);
+UPDATE laptop_data
+SET category = CASE
+    WHEN price < 30000 THEN 'Budget Friendly'
+    WHEN price BETWEEN 30000 AND 50000 THEN 'Best Laptop for Students'
+    WHEN price > 80000 THEN 'High Performance'
+    ELSE 'Professional use laptops'
+END;
+alter TABLE laptop_data ADD COLUMN portability VARCHAR(50);
+
+update laptop_data set portability='thin and light' where weight < 1.8;
+update laptop_data set portability='standard weight' where weight between 1.8 and 2.2;
+update laptop_data set portability='heavy' where weight >2.2;
+
+
+use laptop_price;
+ALTER TABLE laptop_data ADD COLUMN Processor_speed FLOAT;
+UPDATE laptop_data
+SET processor_speed = SUBSTRING_INDEX(cpu, ' ', -1);
+-- Alter the table to increase the size of the processor_speed column
+ALTER TABLE laptop_data
+MODIFY COLUMN processor_speed VARCHAR(20);
+-- Update the 'cpu' column to remove the frequency part
+UPDATE laptop_data
+SET Cpu = CONCAT(
+    SUBSTRING_INDEX(Cpu, ' ', 1),
+    ' ',
+    SUBSTRING_INDEX(SUBSTRING_INDEX(Cpu, ' ', 2), ' ', -1),
+    ' ',
+    SUBSTRING_INDEX(SUBSTRING_INDEX(Cpu, ' ', 3), ' ', -1)
+);
+
+ALTER TABLE laptop_data ADD COLUMN MemoryStr VARCHAR(255);
+ALTER TABLE laptop_data ADD COLUMN first VARCHAR(255);
+ALTER TABLE laptop_data ADD COLUMN second VARCHAR(255);
+ALTER TABLE laptop_data ADD COLUMN Layer1HDD INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Layer1SSD INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Layer1Hybrid INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Layer1Flash_Storage INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Layer2HDD INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Layer2SSD INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Layer2Hybrid INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Layer2Flash_Storage INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN HDD INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN SSD INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Hybrid INT DEFAULT 0;
+ALTER TABLE laptop_data ADD COLUMN Flash_Storage INT DEFAULT 0;
+
+-- Update MemoryStr column to transform Memory
+UPDATE laptop_data
+SET MemoryStr = REPLACE(REPLACE(REPLACE(Memory, 'TB', '000'), 'GB', ''), '.0', '');
+
+-- Split MemoryStr column into first and second
+UPDATE laptop_data
+SET first = TRIM(SUBSTRING_INDEX(MemoryStr, '+', 1)),
+    second = TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(MemoryStr, '+', -1), '+', 1));
+
+-- : Identify memory types in each part (first and second)
+-- 
+UPDATE laptop_data
+SET Layer1HDD = CASE WHEN first LIKE '%HDD%' THEN 1 ELSE 0 END,
+    Layer1SSD = CASE WHEN first LIKE '%SSD%' THEN 1 ELSE 0 END,
+    Layer1Hybrid = CASE WHEN first LIKE '%Hybrid%' THEN 1 ELSE 0 END,
+    Layer1Flash_Storage = CASE WHEN first LIKE '%Flash Storage%' THEN 1 ELSE 0 END;
+
+-- 
+UPDATE laptop_data
+SET Layer2HDD = CASE WHEN second LIKE '%HDD%' THEN 1 ELSE 0 END,
+    Layer2SSD = CASE WHEN second LIKE '%SSD%' THEN 1 ELSE 0 END,
+    Layer2Hybrid = CASE WHEN second LIKE '%Hybrid%' THEN 1 ELSE 0 END,
+    Layer2Flash_Storage = CASE WHEN second LIKE '%Flash Storage%' THEN 1 ELSE 0 END;
+
+--  Ensure first and second columns contain only numeric values
+UPDATE laptop_data
+SET first = IFNULL(NULLIF(REGEXP_REPLACE(first, '[^0-9]', ''), ''), '0'),
+    second = IFNULL(NULLIF(REGEXP_REPLACE(second, '[^0-9]', ''), ''), '0');
+
+--  Calculate total memory for each type
+UPDATE laptop_data
+SET HDD = (CAST(IFNULL(first, '0') AS UNSIGNED) * Layer1HDD + CAST(IFNULL(second, '0') AS UNSIGNED) * Layer2HDD),
+    SSD = (CAST(IFNULL(first, '0') AS UNSIGNED) * Layer1SSD + CAST(IFNULL(second, '0') AS UNSIGNED) * Layer2SSD),
+    Hybrid = (CAST(IFNULL(first, '0') AS UNSIGNED) * Layer1Hybrid + CAST(IFNULL(second, '0') AS UNSIGNED) * Layer2Hybrid),
+    Flash_Storage = (CAST(IFNULL(first, '0') AS UNSIGNED) * Layer1Flash_Storage + CAST(IFNULL(second, '0') AS UNSIGNED) * Layer2Flash_Storage);
+
+--  Drop intermediate columns
+ALTER TABLE laptop_data
+DROP COLUMN MemoryStr,
+DROP COLUMN first,
+DROP COLUMN second,
+DROP COLUMN Layer1HDD,
+DROP COLUMN Layer1SSD,
+DROP COLUMN Layer1Hybrid,
+DROP COLUMN Layer1Flash_Storage,
+DROP COLUMN Layer2HDD,
+DROP COLUMN Layer2SSD,
+DROP COLUMN Layer2Hybrid,
+DROP COLUMN Layer2Flash_Storage;
+
+
+alter table laptop_data add Gpu_brand varchar(30);
+update laptop_data set Gpu_model=substring_index(Gpu,' ',1);
+
+UPDATE laptop_data SET Gpu = TRIM(SUBSTRING(Gpu, LOCATE(' ', Gpu) + 1));
+
+ALTER TABLE laptop_data
+DROP COLUMN Gpu_brand;
+
+use laptop_price;
+SHOW COLUMNS FROM laptop_data;
+
+
