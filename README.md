@@ -44,6 +44,7 @@ Visualization Module:
 Uses Power BI to create dashboards and reports that visualize the findings.
 Reporting Module:
 Generates a detailed report with actionable insights and recommendations.
+
 Technology Stack
 
 Power BI: For data visualization and interactive reporting.
